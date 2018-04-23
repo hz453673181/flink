@@ -353,6 +353,44 @@ class ScalarFunctionsTest extends ScalarTypesTestBase {
   }
 
   @Test
+  def testLPad(): Unit = {
+    testSqlApi("LPAD('hi',4,'??')", "??hi")
+    testSqlApi("LPAD('hi',1,'??')", "h")
+    testSqlApi("LPAD('',1,'??')", "?")
+    testSqlApi("LPAD('',30,'??')", "??????????????????????????????")
+    testSqlApi("LPAD('111',-2,'??')", "null")
+    testSqlApi("LPAD(f33,1,'??')", "null")
+    testSqlApi("LPAD('\u0061\u0062',1,'??')", "a") // the unicode of ab is \u0061\u0062
+    testSqlApi("LPAD('⎨⎨',1,'??')", "⎨")
+    testSqlApi("LPAD('äääääääää',2,'??')", "ää")
+    testSqlApi("LPAD('äääääääää',10,'??')", "?äääääääää")
+
+    testAllApis(
+      "äää".lpad(13, "12345"),
+      "'äää'.lpad(13, '12345')",
+      "LPAD('äää',13,'12345')",
+      "1234512345äää")
+  }
+
+  @Test
+  def testRPad(): Unit = {
+    testSqlApi("RPAD('hi',4,'??')", "hi??")
+    testSqlApi("RPAD('hi',1,'??')", "h")
+    testSqlApi("RPAD('',1,'??')", "?")
+    testSqlApi("RPAD('1',30,'??')", "1?????????????????????????????")
+    testSqlApi("RPAD('111',-2,'??')", "null")
+    testSqlApi("RPAD(f33,1,'??')", "null")
+    testSqlApi("RPAD('\u0061\u0062',1,'??')", "a") // the unicode of ab is \u0061\u0062
+    testSqlApi("RPAD('üö',1,'??')", "ü")
+
+    testAllApis(
+      "äää".rpad(13, "12345"),
+      "'äää'.rpad(13, '12345')",
+      "RPAD('äää',13,'12345')",
+      "äää1234512345")
+  }
+
+  @Test
   def testBin(): Unit = {
 
     testAllApis(
@@ -1248,28 +1286,50 @@ class ScalarFunctionsTest extends ScalarTypesTestBase {
 
   @Test
   def testLog(): Unit = {
-    testSqlApi(
+    testAllApis(
+      'f6.log(),
+      "f6.log",
       "LOG(f6)",
       "1.5260563034950492"
     )
 
-    testSqlApi(
-      "LOG(f6-f6 + 10, f6-f6+100)",
+    testTableApi(
+      Log('f6),
+      "Log(f6)",
+      "1.5260563034950492"
+    )
+
+    testAllApis(
+      ('f6 - 'f6 + 100).log('f6 - 'f6 + 10),
+      "(f6 - f6 + 100).log(f6 - f6 + 10)",
+      "LOG(f6 - f6 + 10, f6 - f6 + 100)",
       "2.0"
     )
 
-    testSqlApi(
+    testAllApis(
+      ('f6 + 20).log(),
+      "(f6+20).log",
       "LOG(f6+20)",
       "3.202746442938317"
     )
 
-    testSqlApi(
+    testAllApis(
+      10.log(),
+      "10.log",
       "LOG(10)",
       "2.302585092994046"
     )
 
-    testSqlApi(
+    testAllApis(
+      100.log(10),
+      "100.log(10)",
       "LOG(10, 100)",
+      "2.0"
+    )
+
+    testTableApi(
+      Log(10, 100),
+      "Log(10, 100)",
       "2.0"
     )
   }
@@ -1387,6 +1447,47 @@ class ScalarFunctionsTest extends ScalarTypesTestBase {
       "f20.extract(YEAR)",
       "EXTRACT(YEAR FROM f20)",
       "2")
+
+    // test SQL only time units
+    testSqlApi(
+      "EXTRACT(MILLENNIUM FROM f18)",
+      "2")
+
+    testSqlApi(
+      "EXTRACT(MILLENNIUM FROM f16)",
+      "2")
+
+    testSqlApi(
+      "EXTRACT(CENTURY FROM f18)",
+      "20")
+
+    testSqlApi(
+      "EXTRACT(CENTURY FROM f16)",
+      "20")
+
+    testSqlApi(
+      "EXTRACT(DOY FROM f18)",
+      "315")
+
+    testSqlApi(
+      "EXTRACT(DOY FROM f16)",
+      "315")
+
+    testSqlApi(
+      "EXTRACT(QUARTER FROM f18)",
+      "4")
+
+    testSqlApi(
+      "EXTRACT(QUARTER FROM f16)",
+      "4")
+
+    testSqlApi(
+      "EXTRACT(WEEK FROM f18)",
+      "45")
+
+    testSqlApi(
+      "EXTRACT(WEEK FROM f16)",
+      "45")
   }
 
   @Test

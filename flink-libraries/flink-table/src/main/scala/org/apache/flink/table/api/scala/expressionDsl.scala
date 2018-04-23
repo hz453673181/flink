@@ -214,6 +214,11 @@ trait ImplicitExpressionOperations {
   def varSamp = VarSamp(expr)
 
   /**
+    *  Returns multiset aggregate of a given expression.
+    */
+  def collect = Collect(expr)
+
+  /**
     * Converts a value to a given type.
     *
     * e.g. "42".cast(Types.INT) leads to 42.
@@ -291,14 +296,24 @@ trait ImplicitExpressionOperations {
   def exp() = Exp(expr)
 
   /**
-    * Calculates the base 10 logarithm of given value.
+    * Calculates the base 10 logarithm of the given value.
     */
   def log10() = Log10(expr)
 
   /**
-    * Calculates the natural logarithm of given value.
+    * Calculates the natural logarithm of the given value.
     */
   def ln() = Ln(expr)
+
+  /**
+    * Calculates the natural logarithm of the given value.
+    */
+  def log() = Log(null, expr)
+
+  /**
+    * Calculates the logarithm of the given value to the given base.
+    */
+  def log(base: Expression) = Log(base, expr)
 
   /**
     * Calculates the given number raised to the power of the other value.
@@ -474,6 +489,22 @@ trait ImplicitExpressionOperations {
     * e.g. "a".position("bbbbba") leads to 6
     */
   def position(haystack: Expression) = Position(expr, haystack)
+
+  /**
+    * Returns a string left-padded with the given pad string to a length of len characters. If
+    * the string is longer than len, the return value is shortened to len characters.
+    *
+    * e.g. "hi".lpad(4, '??') returns "??hi",  "hi".lpad(1, '??') returns "h"
+    */
+  def lpad(len: Expression, pad: Expression) = Lpad(expr, len, pad)
+
+  /**
+    * Returns a string right-padded with the given pad string to a length of len characters. If
+    * the string is longer than len, the return value is shortened to len characters.
+    *
+    * e.g. "hi".rpad(4, '??') returns "hi??",  "hi".rpad(1, '??') returns "h"
+    */
+  def rpad(len: Expression, pad: Expression) = Rpad(expr, len, pad)
 
   /**
     * For windowing function to config over window

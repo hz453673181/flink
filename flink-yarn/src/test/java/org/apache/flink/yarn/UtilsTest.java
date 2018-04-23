@@ -25,7 +25,7 @@ import org.apache.flink.runtime.clusterframework.messages.NotifyResourceStarted;
 import org.apache.flink.runtime.clusterframework.messages.RegisterResourceManager;
 import org.apache.flink.runtime.clusterframework.messages.RegisterResourceManagerSuccessful;
 import org.apache.flink.runtime.instance.AkkaActorGateway;
-import org.apache.flink.runtime.leaderelection.TestingLeaderRetrievalService;
+import org.apache.flink.runtime.leaderretrieval.SettableLeaderRetrievalService;
 import org.apache.flink.runtime.messages.Acknowledge;
 import org.apache.flink.runtime.testingUtils.TestingUtils;
 import org.apache.flink.util.TestLogger;
@@ -98,7 +98,7 @@ public class UtilsTest extends TestLogger {
 
 			Configuration flinkConfig = new Configuration();
 			YarnConfiguration yarnConfig = new YarnConfiguration();
-			TestingLeaderRetrievalService leaderRetrievalService = new TestingLeaderRetrievalService(
+			SettableLeaderRetrievalService leaderRetrievalService = new SettableLeaderRetrievalService(
 				null,
 				null);
 			String applicationMasterHostName = "localhost";
@@ -201,7 +201,7 @@ public class UtilsTest extends TestLogger {
 
 				expectMsgClass(deadline.timeLeft(), RegisterResourceManager.class);
 
-				resourceManagerGateway.tell(new RegisterResourceManagerSuccessful(leader1, Collections.EMPTY_LIST));
+				resourceManagerGateway.tell(new RegisterResourceManagerSuccessful(leader1, Collections.emptyList()));
 
 				for (int i = 0; i < containerList.size(); i++) {
 					expectMsgClass(deadline.timeLeft(), Acknowledge.class);
@@ -217,7 +217,7 @@ public class UtilsTest extends TestLogger {
 
 				expectMsgClass(deadline.timeLeft(), RegisterResourceManager.class);
 
-				resourceManagerGateway.tell(new RegisterResourceManagerSuccessful(leader1, Collections.EMPTY_LIST));
+				resourceManagerGateway.tell(new RegisterResourceManagerSuccessful(leader1, Collections.emptyList()));
 
 				for (Container container: containerList) {
 					resourceManagerGateway.tell(
